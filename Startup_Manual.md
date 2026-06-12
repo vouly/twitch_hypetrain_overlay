@@ -64,7 +64,7 @@ In der Konsole sollte der Input inzwischen in etwa so aussehen:
 ![Konsole](public/Konsole.png)
 
 Damit ist die Verknüpfung abgeschlossen und das Overlay sollte funktionieren! 🎉 
---- 
+
 Um es zu beenden muss einfach die Konsole geschlossen werden. Bei zukünftigen Starts, muss nur die `start.bat` aufgerufen werden. Die gesamte Konfiguration ist einmalig.
 
 ## Testen

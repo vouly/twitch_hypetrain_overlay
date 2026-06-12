@@ -21,6 +21,10 @@ Wenn auf deinem Kanal ein Hype Train startet, fährt ein animierter Zug ins Bild
 
 ---
 
+## Startup für Endnutzer
+
+Wenn dich die gesamte Technik nicht interessiert und du es einfach nutzen möchtest dann klicke [>>HIER<<](Startup_Manual.md)
+
 ## Voraussetzungen
 
 | Abhängigkeit | Version | Link |

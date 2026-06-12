@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hype Train Overlay – Einrichtung</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0414;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #e0cfff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+  .card {
+    background: rgba(20, 8, 40, 0.98);
+    border: 1px solid rgba(100, 65, 165, 0.5);
+    border-radius: 16px;
+    padding: 40px 44px;
+    width: 500px;
+    box-shadow: 0 0 60px rgba(100, 65, 165, 0.25);
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: rgba(224, 207, 255, 0.5);
+    margin-bottom: 28px;
+  }
+
+  .step {
+    background: rgba(100, 65, 165, 0.1);
+    border: 1px solid rgba(100, 65, 165, 0.3);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+  .step-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #a855f7;
+    margin-bottom: 10px;
+  }
+  .step p {
+    font-size: 13px;
+    color: rgba(224, 207, 255, 0.75);
+    line-height: 1.65;
+  }
+  .step a { color: #c084fc; text-decoration: none; }
+  .step a:hover { text-decoration: underline; }
+
+  .redirect-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(232, 121, 249, 0.35);
+    border-radius: 7px;
+    padding: 9px 12px;
+    margin-top: 10px;
+  }
+  .redirect-box code {
+    font-size: 13px;
+    color: #e879f9;
+    flex: 1;
+    word-break: break-all;
+  }
+  .copy-btn {
+    background: none;
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    border-radius: 5px;
+    color: #a855f7;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .copy-btn:hover { background: rgba(168, 85, 247, 0.15); }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: rgba(224, 207, 255, 0.55);
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+  label:first-of-type { margin-top: 2px; }
+  input {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(100, 65, 165, 0.4);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: #a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,0.15); }
+  input::placeholder { color: rgba(224, 207, 255, 0.25); }
+
+  .error-banner {
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #fca5a5;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  button[type=submit] {
+    width: 100%;
+    margin-top: 24px;
+    padding: 13px;
+    background: linear-gradient(135deg, #6441a5, #9b59b6);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(100, 65, 165, 0.4);
+  }
+  button[type=submit]:hover { opacity: 0.9; box-shadow: 0 4px 28px rgba(100, 65, 165, 0.6); }
+  .hint {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(224, 207, 255, 0.35);
+    margin-top: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🚂 Hype Train Overlay</h1>
+  <p class="subtitle">Einmalige Einrichtung – dauert ca. 2 Minuten</p>
+
+  <!-- Step 1 -->
+  <div class="step">
+    <div class="step-title">Schritt 1 – Twitch App erstellen</div>
+    <p>
+      Gehe zu <a href="https://dev.twitch.tv/console/apps" target="_blank">dev.twitch.tv/console/apps</a>
+      und klicke auf <strong>„Register Your Application"</strong>.<br><br>
+      Beliebiger Name · Kategorie: <em>Broadcasting Suite</em><br><br>
+      Trage als <strong>OAuth Redirect URL</strong> exakt diese Adresse ein:
+    </p>
+    <div class="redirect-box">
+      <code id="redirectUri">wird geladen…</code>
+      <button class="copy-btn" onclick="copyRedirect()">Kopieren</button>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step">
+    <div class="step-title">Schritt 2 – Zugangsdaten eingeben</div>
+
+    <div id="errorBanner" class="error-banner" style="display:none">
+      Bitte alle Felder ausfüllen.
+    </div>
+
+    <form method="POST" action="/setup" id="setupForm">
+      <label>Client ID</label>
+      <input type="text" name="client_id" placeholder="abc123def456…" required autocomplete="off" spellcheck="false"/>
+
+      <label>Client Secret</label>
+      <input type="password" name="client_secret" placeholder="••••••••••••••••••••" required autocomplete="off"/>
+
+      <label>Twitch-Kanalname</label>
+      <input type="text" name="channel" placeholder="deinkanal" required autocomplete="off" spellcheck="false"/>
+
+      <button type="submit">Weiter → Mit Twitch verbinden</button>
+    </form>
+  </div>
+
+  <p class="hint">Daten werden nur lokal gespeichert · <a href="https://dev.twitch.tv/console/apps" target="_blank" style="color:rgba(224,207,255,.35)">Twitch Developer Console</a></p>
+</div>
+
+<script>
+  // Show redirect URI dynamically using current host
+  const redirectUri = `http://${location.host}/auth/callback`;
+  document.getElementById('redirectUri').textContent = redirectUri;
+
+  // Show error banner if redirected back with ?error
+  if (new URLSearchParams(location.search).get('error')) {
+    document.getElementById('errorBanner').style.display = 'block';
+  }
+
+  function copyRedirect() {
+    navigator.clipboard.writeText(redirectUri).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✓ Kopiert';
+      setTimeout(() => btn.textContent = 'Kopieren', 2000);
+    });
+  }
+</script>
+</body>
+</html>

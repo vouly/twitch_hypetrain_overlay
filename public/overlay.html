@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hype Train Overlay</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: transparent;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden;
+    width: 400px;
+    height: 180px;
+  }
+
+  /* ── Container ── */
+  #overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 400px;
+    height: 180px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease, width 0.6s ease, height 0.6s ease;
+    pointer-events: none;
+  }
+  #overlay.compact {
+    width: 160px;
+    height: 160px;
+  }
+  #overlay.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Track ── */
+  .track-wrapper {
+    position: relative;
+    height: 140px;
+  }
+
+  /* Rails */
+  .rails {
+    position: absolute;
+    bottom: 18px;
+    left: 0;
+    right: 0;
+    height: 14px;
+  }
+  .rail {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #6441a5, #9b59b6, #6441a5);
+    box-shadow: 0 0 8px rgba(148, 91, 214, 0.6);
+  }
+  .rail.top { top: 0; }
+  .rail.bottom { bottom: 0; }
+
+  /* Sleepers */
+  .sleepers {
+    position: absolute;
+    bottom: 18px;
+    left: 0;
+    right: 0;
+    height: 14px;
+    overflow: hidden;
+  }
+  .sleeper {
+    position: absolute;
+    width: 8px;
+    height: 14px;
+    background: #4a3060;
+    border-radius: 1px;
+    bottom: 0;
+    animation: sleeper-scroll 0.6s linear infinite;
+  }
+  @keyframes sleeper-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(40px); }
+  }
+
+  /* ── Train ── */
+  #train-wrapper {
+    position: absolute;
+    bottom: 28px;
+    left: 60px;
+  }
+  #train-wrapper.train-enter {
+    animation: train-slide-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  #train-wrapper.train-exit {
+    animation: train-slide-out 0.7s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+  }
+  @keyframes train-slide-in {
+    from { transform: translateX(820px); }
+    to   { transform: translateX(0); }
+  }
+  @keyframes train-slide-out {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-400px); }
+  }
+
+  #train {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    filter: drop-shadow(0 4px 12px rgba(100, 65, 165, 0.8));
+  }
+  #train.riding {
+    animation: train-ride 0.18s ease-in-out infinite alternate;
+  }
+  @keyframes train-ride {
+    from { transform: translateY(0px) rotate(-0.3deg); }
+    to   { transform: translateY(-3px) rotate(0.3deg); }
+  }
+
+  /* Engine SVG */
+  .engine { width: 110px; height: 70px; }
+  .car    { width: 80px;  height: 55px; }
+
+  /* Steam puffs */
+  .steam-container {
+    position: absolute;
+    top: -10px;
+    left: 28px;
+    display: flex;
+    gap: 4px;
+  }
+  .puff {
+    width: 12px;
+    height: 12px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 50%;
+    opacity: 0;
+  }
+  #train.riding .puff:nth-child(1) { animation: puff 0.9s ease-out 0.0s infinite; }
+  #train.riding .puff:nth-child(2) { animation: puff 0.9s ease-out 0.2s infinite; }
+  #train.riding .puff:nth-child(3) { animation: puff 0.9s ease-out 0.4s infinite; }
+  @keyframes puff {
+    0%   { opacity: 0.9; transform: translateY(0) scale(0.6); }
+    100% { opacity: 0;   transform: translateY(-28px) scale(2.2); }
+  }
+
+  /* Speed lines */
+  .speed-lines {
+    position: absolute;
+    bottom: 42px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  #overlay.active .speed-lines { opacity: 1; }
+  .speed-line {
+    position: absolute;
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(90deg, transparent, rgba(148,91,214,0.6), transparent);
+    animation: speed-scroll 0.4s linear infinite;
+  }
+  @keyframes speed-scroll {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(100%); }
+  }
+
+  /* ── Progress Bar ── */
+  .progress-section {
+    position: relative;
+    margin-top: 4px;
+    padding: 0 16px;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .hype-label {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #e0cfff;
+    text-shadow: 0 0 10px rgba(148, 91, 214, 0.9);
+  }
+  .level-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #6441a5, #9b59b6);
+    padding: 2px 10px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(148, 91, 214, 0.7);
+  }
+
+  .progress-track {
+    position: relative;
+    height: 16px;
+    background: rgba(30, 15, 50, 0.85);
+    border-radius: 8px;
+    border: 1px solid rgba(148, 91, 214, 0.4);
+    overflow: hidden;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.4), 0 0 12px rgba(100,65,165,0.3);
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #6441a5, #a855f7, #e879f9);
+    background-size: 200% 100%;
+    transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: shimmer 2s linear infinite;
+    position: relative;
+  }
+  @keyframes shimmer {
+    0%   { background-position: 200% center; }
+    100% { background-position: -200% center; }
+  }
+
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 40px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Milestone markers */
+  .milestones {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+  }
+  .milestone {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(255,255,255,0.2);
+  }
+  .milestone::after {
+    content: attr(data-label);
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+    white-space: nowrap;
+  }
+
+  /* ── End burst ── */
+  .burst {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .burst.fire { animation: burst-out 2s ease-out forwards; }
+  @keyframes burst-out {
+    0%   { opacity: 1; background: radial-gradient(circle at 30% 50%, rgba(148,91,214,0.5), transparent 60%); }
+    100% { opacity: 0; background: radial-gradient(circle at 30% 50%, transparent, transparent); }
+  }
+
+  /* ── Background panel ── */
+  .panel {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+      rgba(10, 4, 20, 0) 0%,
+      rgba(15, 6, 30, 0.75) 40%,
+      rgba(20, 8, 40, 0.9) 100%
+    );
+    border-top: 1px solid rgba(100, 65, 165, 0.3);
+  }
+
+  /* ── Compact mode ── */
+  .panel, .track-wrapper, .progress-section, .speed-lines {
+    transition: opacity 0.6s ease;
+  }
+  #overlay.compact .panel,
+  #overlay.compact .track-wrapper,
+  #overlay.compact .progress-section,
+  #overlay.compact .speed-lines {
+    opacity: 0;
+  }
+
+  #compact {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 160px;
+    height: 160px;
+    opacity: 0;
+    transform: scale(0.7);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    pointer-events: none;
+  }
+  #overlay.compact #compact {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .compact-ring-svg {
+    position: absolute;
+    inset: 0;
+    width: 160px;
+    height: 160px;
+  }
+  .ring-bg {
+    fill: rgba(10, 4, 20, 0.92);
+    stroke: rgba(100, 65, 165, 0.4);
+    stroke-width: 2;
+  }
+  .ring-fill {
+    fill: none;
+    stroke: url(#ringGrad);
+    stroke-width: 9;
+    stroke-linecap: round;
+    stroke-dasharray: 427.3;
+    stroke-dashoffset: 427.3;
+    transform: rotate(-90deg);
+    transform-origin: 80px 80px;
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .compact-engine-wrap {
+    position: absolute;
+    top: 76px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .compact-engine-wrap .engine {
+    width: 90px;
+    height: 58px;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<div id="overlay">
+  <div class="panel"></div>
+
+  <!-- Speed lines -->
+  <div class="speed-lines" id="speedLines">
+    <div class="speed-line" style="top:4px;  left:20%; width:180px; animation-duration:0.35s; animation-delay:0.0s;"></div>
+    <div class="speed-line" style="top:12px; left:40%; width:120px; animation-duration:0.45s; animation-delay:0.1s;"></div>
+    <div class="speed-line" style="top:22px; left:10%; width:220px; animation-duration:0.38s; animation-delay:0.05s;"></div>
+  </div>
+
+  <!-- Burst overlay -->
+  <div class="burst" id="burst"></div>
+
+  <div class="track-wrapper">
+    <!-- Sleepers -->
+    <div class="sleepers" id="sleepers">
+      <!-- generated by JS -->
+    </div>
+
+    <!-- Rails -->
+    <div class="rails">
+      <div class="rail top"></div>
+      <div class="rail bottom"></div>
+    </div>
+
+    <!-- Train -->
+    <div id="train-wrapper">
+    <div id="train">
+      <div class="steam-container">
+        <div class="puff"></div>
+        <div class="puff"></div>
+        <div class="puff"></div>
+      </div>
+      <!-- Engine -->
+      <svg class="engine" viewBox="0 0 110 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Chimney -->
+        <rect x="22" y="4" width="10" height="18" rx="2" fill="#3d2060"/>
+        <rect x="19" y="4" width="16" height="5" rx="2" fill="#4a2878"/>
+        <!-- Boiler -->
+        <rect x="10" y="22" width="70" height="30" rx="6" fill="#4a2878"/>
+        <rect x="10" y="22" width="70" height="12" rx="6" fill="#5a3090"/>
+        <!-- Cab -->
+        <rect x="68" y="15" width="30" height="37" rx="4" fill="#3d2060"/>
+        <rect x="72" y="19" width="10" height="12" rx="2" fill="rgba(200,160,255,0.35)" stroke="rgba(200,160,255,0.5)" stroke-width="1"/>
+        <rect x="86" y="19" width="8"  height="12" rx="2" fill="rgba(200,160,255,0.35)" stroke="rgba(200,160,255,0.5)" stroke-width="1"/>
+        <!-- Headlight -->
+        <circle cx="12" cy="37" r="5" fill="#e879f9" opacity="0.9"/>
+        <circle cx="12" cy="37" r="3" fill="#fff" opacity="0.95"/>
+        <!-- Stripe detail -->
+        <rect x="10" y="40" width="70" height="3" rx="1" fill="#7c3aed" opacity="0.6"/>
+        <!-- Wheels -->
+        <circle cx="28" cy="55" r="11" fill="#2a1040" stroke="#7c3aed" stroke-width="2.5"/>
+        <circle cx="28" cy="55" r="5"  fill="#4a2878"/>
+        <circle cx="28" cy="55" r="2"  fill="#9b59b6"/>
+        <circle cx="52" cy="55" r="11" fill="#2a1040" stroke="#7c3aed" stroke-width="2.5"/>
+        <circle cx="52" cy="55" r="5"  fill="#4a2878"/>
+        <circle cx="52" cy="55" r="2"  fill="#9b59b6"/>
+        <circle cx="75" cy="57" r="9"  fill="#2a1040" stroke="#7c3aed" stroke-width="2"/>
+        <circle cx="75" cy="57" r="4"  fill="#4a2878"/>
+        <circle cx="75" cy="57" r="1.5" fill="#9b59b6"/>
+        <!-- Coupling -->
+        <rect x="0" y="50" width="10" height="5" rx="2" fill="#3d2060"/>
+      </svg>
+
+      <!-- Car 1 -->
+      <svg class="car" viewBox="0 0 80 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="8" width="76" height="34" rx="5" fill="#3d2060"/>
+        <rect x="2" y="8" width="76" height="12" rx="5" fill="#4a2878"/>
+        <rect x="8"  y="14" width="14" height="10" rx="2" fill="rgba(200,160,255,0.3)" stroke="rgba(200,160,255,0.4)" stroke-width="1"/>
+        <rect x="26" y="14" width="14" height="10" rx="2" fill="rgba(200,160,255,0.3)" stroke="rgba(200,160,255,0.4)" stroke-width="1"/>
+        <rect x="44" y="14" width="14" height="10" rx="2" fill="rgba(200,160,255,0.3)" stroke="rgba(200,160,255,0.4)" stroke-width="1"/>
+        <rect x="62" y="14" width="12" height="10" rx="2" fill="rgba(200,160,255,0.3)" stroke="rgba(200,160,255,0.4)" stroke-width="1"/>
+        <rect x="2"  y="28" width="76" height="3" rx="1" fill="#7c3aed" opacity="0.5"/>
+        <circle cx="18" cy="44" r="9"  fill="#2a1040" stroke="#7c3aed" stroke-width="2"/>
+        <circle cx="18" cy="44" r="4"  fill="#4a2878"/>
+        <circle cx="62" cy="44" r="9"  fill="#2a1040" stroke="#7c3aed" stroke-width="2"/>
+        <circle cx="62" cy="44" r="4"  fill="#4a2878"/>
+        <rect x="0" y="38" width="6" height="4" rx="1" fill="#2a1040"/>
+        <rect x="74" y="38" width="6" height="4" rx="1" fill="#2a1040"/>
+      </svg>
+
+      <!-- Car 2 -->
+      <svg class="car" viewBox="0 0 80 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="8" width="76" height="34" rx="5" fill="#321855"/>
+        <rect x="2" y="8" width="76" height="12" rx="5" fill="#422068"/>
+        <rect x="8"  y="14" width="14" height="10" rx="2" fill="rgba(232,121,249,0.2)" stroke="rgba(232,121,249,0.4)" stroke-width="1"/>
+        <rect x="26" y="14" width="14" height="10" rx="2" fill="rgba(232,121,249,0.2)" stroke="rgba(232,121,249,0.4)" stroke-width="1"/>
+        <rect x="44" y="14" width="14" height="10" rx="2" fill="rgba(232,121,249,0.2)" stroke="rgba(232,121,249,0.4)" stroke-width="1"/>
+        <rect x="62" y="14" width="12" height="10" rx="2" fill="rgba(232,121,249,0.2)" stroke="rgba(232,121,249,0.4)" stroke-width="1"/>
+        <rect x="2"  y="28" width="76" height="3" rx="1" fill="#a855f7" opacity="0.5"/>
+        <circle cx="18" cy="44" r="9"  fill="#2a1040" stroke="#7c3aed" stroke-width="2"/>
+        <circle cx="18" cy="44" r="4"  fill="#422068"/>
+        <circle cx="62" cy="44" r="9"  fill="#2a1040" stroke="#7c3aed" stroke-width="2"/>
+        <circle cx="62" cy="44" r="4"  fill="#422068"/>
+        <rect x="0" y="38" width="6" height="4" rx="1" fill="#2a1040"/>
+        <rect x="74" y="38" width="6" height="4" rx="1" fill="#2a1040"/>
+      </svg>
+    </div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-section">
+    <div class="progress-header">
+      <span class="hype-label">🚂 Hype Train</span>
+      <span class="level-badge" id="levelBadge">Level 1</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+      <div class="milestones" id="milestones"></div>
+    </div>
+  </div>
+
+  <!-- Compact mode widget -->
+  <div id="compact">
+    <svg class="compact-ring-svg" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#6441a5"/>
+          <stop offset="50%" stop-color="#a855f7"/>
+          <stop offset="100%" stop-color="#e879f9"/>
+        </linearGradient>
+        <filter id="levelGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <circle class="ring-bg" cx="80" cy="80" r="68"/>
+      <circle class="ring-fill" id="compactRing" cx="80" cy="80" r="68"/>
+      <text id="compactLevel"
+        x="80" y="58"
+        text-anchor="middle" dominant-baseline="middle"
+        font-family="'Segoe UI', system-ui, sans-serif"
+        font-size="46" font-weight="900"
+        fill="#fff" filter="url(#levelGlow)">1</text>
+    </svg>
+    <div class="compact-engine-wrap">
+      <svg class="engine" viewBox="0 0 110 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="22" y="4" width="10" height="18" rx="2" fill="#3d2060"/>
+        <rect x="19" y="4" width="16" height="5" rx="2" fill="#4a2878"/>
+        <rect x="10" y="22" width="70" height="30" rx="6" fill="#4a2878"/>
+        <rect x="10" y="22" width="70" height="12" rx="6" fill="#5a3090"/>
+        <rect x="68" y="15" width="30" height="37" rx="4" fill="#3d2060"/>
+        <rect x="72" y="19" width="10" height="12" rx="2" fill="rgba(200,160,255,0.35)" stroke="rgba(200,160,255,0.5)" stroke-width="1"/>
+        <rect x="86" y="19" width="8"  height="12" rx="2" fill="rgba(200,160,255,0.35)" stroke="rgba(200,160,255,0.5)" stroke-width="1"/>
+        <circle cx="12" cy="37" r="5" fill="#e879f9" opacity="0.9"/>
+        <circle cx="12" cy="37" r="3" fill="#fff" opacity="0.95"/>
+        <rect x="10" y="40" width="70" height="3" rx="1" fill="#7c3aed" opacity="0.6"/>
+        <circle cx="28" cy="55" r="11" fill="#2a1040" stroke="#7c3aed" stroke-width="2.5"/>
+        <circle cx="28" cy="55" r="5"  fill="#4a2878"/>
+        <circle cx="28" cy="55" r="2"  fill="#9b59b6"/>
+        <circle cx="52" cy="55" r="11" fill="#2a1040" stroke="#7c3aed" stroke-width="2.5"/>
+        <circle cx="52" cy="55" r="5"  fill="#4a2878"/>
+        <circle cx="52" cy="55" r="2"  fill="#9b59b6"/>
+        <circle cx="75" cy="57" r="9"  fill="#2a1040" stroke="#7c3aed" stroke-width="2"/>
+        <circle cx="75" cy="57" r="4"  fill="#4a2878"/>
+        <circle cx="75" cy="57" r="1.5" fill="#9b59b6"/>
+        <rect x="0" y="50" width="10" height="5" rx="2" fill="#3d2060"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+const overlay     = document.getElementById('overlay');
+const train       = document.getElementById('train');
+const progressFill = document.getElementById('progressFill');
+const levelBadge  = document.getElementById('levelBadge');
+const burst       = document.getElementById('burst');
+const sleepersEl  = document.getElementById('sleepers');
+
+// Generate sleepers
+(function() {
+  for (let i = 0; i < 25; i++) {
+    const s = document.createElement('div');
+    s.className = 'sleeper';
+    s.style.left = `${i * 40}px`;
+    s.style.animationDelay = `${(i * 0.6 / 25).toFixed(2)}s`;
+    sleepersEl.appendChild(s);
+  }
+})();
+
+const COMPACT_DELAY = 10_000; // ms ohne Event → Compact-Mode (anpassbar)
+const RING_C = 2 * Math.PI * 68; // Umfang des Compact-Rings (r=68) ≈ 427.3
+
+const compactRingEl  = document.getElementById('compactRing');
+const compactLevelEl = document.getElementById('compactLevel');
+const trainWrapper   = document.getElementById('train-wrapper');
+
+let hideTimer    = null;
+let compactTimer = null;
+let activeLevel  = 1;
+
+function showOverlay() {
+  overlay.classList.add('visible', 'active');
+  train.classList.add('riding');
+  clearTimeout(hideTimer);
+}
+
+function hideOverlay(delay = 8000) {
+  clearTimeout(hideTimer);
+  hideTimer = setTimeout(() => {
+    overlay.classList.remove('visible', 'active', 'compact');
+    train.classList.remove('riding');
+    trainWrapper.classList.remove('train-enter', 'train-exit');
+    clearTimeout(compactTimer);
+  }, delay);
+}
+
+function trainSlideIn() {
+  trainWrapper.classList.remove('train-exit');
+  trainWrapper.classList.add('train-enter');
+  setTimeout(() => trainWrapper.classList.remove('train-enter'), 800);
+}
+
+function trainSlideOut() {
+  trainWrapper.classList.remove('train-enter');
+  trainWrapper.classList.add('train-exit');
+}
+
+function setProgress(progress, goal) {
+  const pct = goal > 0 ? Math.min(100, Math.round((progress / goal) * 100)) : 0;
+  progressFill.style.width = pct + '%';
+}
+
+function setLevel(level) {
+  activeLevel = level;
+  levelBadge.textContent = `Level ${level}`;
+}
+
+function fireBurst() {
+  burst.className = '';
+  void burst.offsetWidth;
+  burst.classList.add('fire');
+}
+
+function updateCompact(level, progress, goal) {
+  compactLevelEl.textContent = level;
+  const offset = goal > 0 ? RING_C * (1 - Math.min(1, progress / goal)) : RING_C;
+  compactRingEl.style.strokeDashoffset = offset;
+}
+
+function resetCompactTimer() {
+  overlay.classList.remove('compact');
+  clearTimeout(compactTimer);
+  compactTimer = setTimeout(() => overlay.classList.add('compact'), COMPACT_DELAY);
+}
+
+// WebSocket connection to local server
+function connectWS() {
+  const ws = new WebSocket(`ws://${location.host}/overlay-ws`);
+
+  ws.onopen = () => console.log('[Overlay] Verbunden mit Server');
+
+  ws.onmessage = (e) => {
+    let msg;
+    try { msg = JSON.parse(e.data); } catch { return; }
+
+    const ev = msg.event;
+
+    if (msg.type === 'hype_train.begin') {
+      setLevel(ev.level ?? 1);
+      setProgress(ev.progress ?? 0, ev.goal ?? 1);
+      updateCompact(ev.level ?? 1, ev.progress ?? 0, ev.goal ?? 1);
+      showOverlay();
+      trainSlideIn();
+      resetCompactTimer();
+    }
+
+    if (msg.type === 'hype_train.progress') {
+      setLevel(ev.level ?? activeLevel);
+      setProgress(ev.progress, ev.goal);
+      updateCompact(ev.level ?? activeLevel, ev.progress, ev.goal);
+      showOverlay();
+      resetCompactTimer();
+    }
+
+    if (msg.type === 'hype_train.end') {
+      setLevel(ev.level ?? activeLevel);
+      setProgress(ev.total ?? 1, ev.total ?? 1);
+      updateCompact(ev.level ?? activeLevel, ev.total ?? 1, ev.total ?? 1);
+      clearTimeout(compactTimer);
+      overlay.classList.remove('compact');
+      trainSlideOut();
+      fireBurst();
+      hideOverlay(5000);
+    }
+  };
+
+  ws.onclose = () => {
+    console.log('[Overlay] Verbindung getrennt. Erneuter Versuch in 3s...');
+    setTimeout(connectWS, 3000);
+  };
+
+  ws.onerror = (e) => console.error('[Overlay] WebSocket Fehler', e);
+}
+
+connectWS();
+
+// ── Demo mode: auto-preview in browser ──────────────────────────────────────
+// Startet eine Demo wenn nach 1.5s kein Server gefunden wird.
+// In OBS bleibt die echte WS-Verbindung aktiv, die Demo startet nie.
+let demoStarted = false;
+let wsConnected  = false;
+
+const demoWS = new WebSocket(`ws://${location.host}/overlay-ws`);
+demoWS.onopen  = () => { wsConnected = true; };
+demoWS.onerror = () => {
+  if (!wsConnected && !demoStarted) startDemo();
+};
+
+function startDemo() {
+  demoStarted = true;
+  console.log('[Demo] Keine Server-Verbindung – Demo-Modus aktiv');
+  let progress = 0;
+  const goal   = 1800;
+  let level    = 1;
+
+  setLevel(1);
+  setProgress(0, goal);
+  updateCompact(1, 0, goal);
+  showOverlay();
+  trainSlideIn();
+  resetCompactTimer();
+
+  const interval = setInterval(() => {
+    progress += Math.floor(Math.random() * 120 + 60);
+    if (progress >= goal && level < 5) {
+      progress = 0;
+      level++;
+      setLevel(level);
+    }
+    if (level >= 5 && progress >= goal) {
+      progress = goal;
+      setProgress(progress, goal);
+      updateCompact(level, progress, goal);
+      clearInterval(interval);
+      clearTimeout(compactTimer);
+      overlay.classList.remove('compact');
+      trainSlideOut();
+      fireBurst();
+      hideOverlay(5000);
+      return;
+    }
+    setProgress(progress, goal);
+    updateCompact(level, progress, goal);
+    resetCompactTimer();
+  }, 800);
+}
+</script>
+</body>
+</html>

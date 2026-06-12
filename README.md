@@ -45,7 +45,7 @@ Der Twitch-Kanal muss **Affiliate oder Partner** sein, damit Hype Train Events a
 ## Installation
 
 ```bash
-git clone https://github.com/dein-user/twitch-hypetrain-overlay.git
+git clone https://github.com/vouly/twitch-hypetrain-overlay.git
 cd twitch-hypetrain-overlay
 npm install
 ```

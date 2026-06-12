@@ -1,13 +1,12 @@
-# 🚂 Twitch Hype Train Overlay Startup & Installationhilfe
+# 🚂 Twitch Hype Train Overlay Startup & Installationshilfe
 
 Step-by-Step Anleitung dieses Tool zu nutzen
 
-## 1. Lade den Quellcode der Apllikation herunter
+## 1. Lade den Quellcode der Applikation herunter
 
 Klicke rechts auf die letzte veröffentlichte Version oder folge diesem Link: [Releases](https://github.com/vouly/twitch_hypetrain_overlay/releases)
 
 ![Letztes Release anklicken](public/Download_Start.png)
-
 
 Lade die Zip Datei herunter:
 
@@ -17,13 +16,13 @@ Entpacke den Code an einer beliebigen Stelle auf deinem Computer.
 
 ## 2. Das Programm starten
 
-> Info: Es wird eine aktuelle Node.js Version benötigt, damit alles funktioniert. Wenn du sicher bist, dass es nicht installiert ist kannst du direkt unter [https://nodejs.org](https://nodejs.org) eine aktuelle Version herunterladen (LTS-Version empfohlen).
+> Info: Es wird eine aktuelle Node.js Version benötigt damit alles funktioniert. Wenn du sicher bist, dass es nicht installiert ist kannst du direkt unter [https://nodejs.org](https://nodejs.org) eine aktuelle Version herunterladen (LTS-Version empfohlen).
 
 Die Start.bat starten
 
 ![Start.bat ausführen](public/Start_Bat.png)
 
-Sollte Node.js nicht installiert sein. Öffnet sich automatisch die Webseite von Node.js, damit man es herunterladen und installieren kann. Wenn es installiert ist, das Konsolenfenster schließen und die `start.bat` neu ausführen.
+Sollte Node.js nicht installiert sein, öffnet sich automatisch die Webseite von Node.js damit man es herunterladen und installieren kann. Wenn es installiert ist das Konsolenfenster schließen und die `start.bat` neu ausführen.
 
 Beim ersten Start werden nun die Abhängigkeiten installiert. Gegebenenfalls muss anschließend die `start.bat` noch einmal ausgeführt werden.
 

@@ -2,7 +2,7 @@
 
 Ein animiertes Browser-Overlay für Twitch Hype Trains – als OBS Browser Source einsetzbar.
 
-Wenn auf deinem Kanal ein Hype Train startet, fährt ein animierter Zug ins Bild, zeigt den aktuellen Level und den Fortschritt per Shimmer-Balken an und verschwindet 8 Sekunden nach dem Ende wieder. Nach 30 Sekunden Inaktivität schrumpft das Overlay auf einen kompakten Ring-Modus (160 × 160 px), der diskret in einer Ecke bleibt.
+Wenn auf deinem Kanal ein Hype Train startet, fährt ein animierter Zug ins Bild, zeigt den aktuellen Level und den Fortschritt per Shimmer-Balken an und verschwindet 8 Sekunden nach dem Ende wieder. Nach 10 Sekunden Inaktivität schrumpft das Overlay auf einen kompakten Ring-Modus (160 × 160 px), der diskret in einer Ecke bleibt.
 
 ![Demo-Modus](public/Train_Minimal.png) ![Demo-Modus](public/Train_Progress.gif)
 > Tipp: Öffne die `public/overlay.html` direkt im Browser ohne laufenden Server – das Overlay startet automatisch eine Demo-Animation durch alle 5 Level.

@@ -79,3 +79,13 @@ Mit laufendem Server können Events manuell ausgelöst werden – kein echter Hy
 | [http://localhost:3000/health](http://localhost:3000/health) | Serverstatus und Anzahl verbundener Clients |
 
 Alle Query-Parameter bei `begin` und `progress` sind optional; ohne Angabe werden Standardwerte verwendet.
+
+### Golden Kappa Train testen
+
+![Golden Kappa Train](public/Golden_train.png)
+
+Der seltene Golden Kappa Train zeigt den Zug und alle Akzente in Gold statt Lila. Zum Testen einfach `train_type=golden_kappa` an die begin-URL anhängen:
+
+[http://localhost:3000/test/begin?train_type=golden_kappa](http://localhost:3000/test/begin?train_type=golden_kappa)
+
+Danach kann mit den normalen Fortschritts- und End-URLs weitergetestet werden. Mögliche Werte für `train_type` sind `regular`, `treasure` und `golden_kappa`.

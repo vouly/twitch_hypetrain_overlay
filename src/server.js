@@ -160,10 +160,11 @@ function saveTokens(tokens) {
 // ── Test endpoints ───────────────────────────────────────────────────────────
 
 app.get("/test/begin", (req, res) => {
-  const level = Number(req.query.level ?? 1);
-  const goal  = Number(req.query.goal  ?? 1800);
-  broadcast({ type: "hype_train.begin", event: { level, progress: 0, goal } });
-  res.json({ sent: "hype_train.begin", level, goal });
+  const level      = Number(req.query.level ?? 1);
+  const goal       = Number(req.query.goal  ?? 1800);
+  const train_type = req.query.train_type ?? "regular";
+  broadcast({ type: "hype_train.begin", event: { level, progress: 0, goal, type: train_type } });
+  res.json({ sent: "hype_train.begin", level, goal, train_type });
 });
 
 app.get("/test/progress", (req, res) => {

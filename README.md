@@ -118,6 +118,16 @@ Mit laufendem Server können Events manuell ausgelöst werden – kein echter Hy
 
 Alle Query-Parameter bei `begin` und `progress` sind optional; ohne Angabe werden Standardwerte verwendet.
 
+### Golden Kappa Train
+
+Der seltene Golden Kappa Train färbt Zug, Schienen, Fortschrittsbalken und alle Akzente in Gold. Zum Testen `train_type=golden_kappa` an die begin-URL anhängen:
+
+```
+http://localhost:3000/test/begin?train_type=golden_kappa
+```
+
+Mögliche Werte für `train_type`: `regular`, `treasure`, `golden_kappa`.
+
 ---
 
 ## Anpassen

@@ -301,6 +301,44 @@
     );
   }
 
+  /* ── Golden Kappa mode ── */
+  #overlay.golden #train-wrapper {
+    filter: hue-rotate(-220deg) saturate(1.4) brightness(1.05);
+  }
+  #overlay.golden #compact {
+    filter: hue-rotate(-220deg) saturate(1.4) brightness(1.05);
+  }
+  #overlay.golden {
+    border-color: rgba(255, 185, 0, 0.85);
+    box-shadow: 0 0 10px rgba(255, 185, 0, 0.65), 0 0 24px rgba(255, 185, 0, 0.25);
+  }
+  #overlay.golden.compact {
+    border-color: transparent;
+    box-shadow: none;
+  }
+  #overlay.golden .hype-label {
+    color: #ffe066;
+    text-shadow: 0 0 10px rgba(255, 185, 0, 0.9);
+  }
+  #overlay.golden .level-badge {
+    background: linear-gradient(135deg, #b8860b, #ffd700);
+    box-shadow: 0 0 8px rgba(255, 185, 0, 0.7);
+  }
+  #overlay.golden .progress-track {
+    border-color: rgba(255, 185, 0, 0.4);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.4), 0 0 12px rgba(255, 185, 0, 0.3);
+  }
+  #overlay.golden .progress-fill {
+    background: linear-gradient(90deg, #b8860b, #ffd700, #ffec80);
+  }
+  #overlay.golden .rail {
+    background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b);
+    box-shadow: 0 0 8px rgba(255, 185, 0, 0.6);
+  }
+  #overlay.golden .speed-line {
+    background: linear-gradient(90deg, transparent, rgba(255, 185, 0, 0.6), transparent);
+  }
+
   /* ── Compact mode ── */
   .panel, .track-wrapper, .progress-section, .speed-lines {
     transition: opacity 0.6s ease;
@@ -474,7 +512,7 @@
   <!-- Progress bar -->
   <div class="progress-section">
     <div class="progress-header">
-      <span class="hype-label">🚂 Hype Train</span>
+      <span class="hype-label" id="hypeLabel">🚂 Hype Train</span>
       <span class="level-badge" id="levelBadge">Level 1</span>
     </div>
     <div class="progress-track">
@@ -538,6 +576,7 @@ const overlay     = document.getElementById('overlay');
 const train       = document.getElementById('train');
 const progressFill = document.getElementById('progressFill');
 const levelBadge  = document.getElementById('levelBadge');
+const hypeLabel   = document.getElementById('hypeLabel');
 const burst       = document.getElementById('burst');
 const sleepersEl  = document.getElementById('sleepers');
 
@@ -572,7 +611,8 @@ function showOverlay() {
 function hideOverlay(delay = 8000) {
   clearTimeout(hideTimer);
   hideTimer = setTimeout(() => {
-    overlay.classList.remove('visible', 'active', 'compact');
+    overlay.classList.remove('visible', 'active', 'compact', 'golden');
+    hypeLabel.textContent = '🚂 Hype Train';
     train.classList.remove('riding');
     trainWrapper.classList.remove('train-enter', 'train-exit');
     clearTimeout(compactTimer);
@@ -631,6 +671,9 @@ function connectWS() {
     const ev = msg.event;
 
     if (msg.type === 'hype_train.begin') {
+      const isGolden = ev.type === 'golden_kappa';
+      overlay.classList.toggle('golden', isGolden);
+      hypeLabel.textContent = isGolden ? '✨ Golden Kappa Train' : '🚂 Hype Train';
       setLevel(ev.level ?? 1);
       setProgress(ev.progress ?? 0, ev.goal ?? 1);
       updateCompact(ev.level ?? 1, ev.progress ?? 0, ev.goal ?? 1);

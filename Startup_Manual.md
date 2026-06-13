@@ -20,7 +20,7 @@ Entpacke den Code an einer beliebigen Stelle auf deinem Computer.
 
 Die Start.bat starten
 
-![Start.bat ausführen](public/Start_Bat.png)
+![Start.bat ausführen](public/Start_bat.png)
 
 Sollte Node.js nicht installiert sein, öffnet sich automatisch die Webseite von Node.js damit man es herunterladen und installieren kann. Wenn es installiert ist das Konsolenfenster schließen und die `start.bat` neu ausführen.
 

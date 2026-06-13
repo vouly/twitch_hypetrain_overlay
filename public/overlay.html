@@ -27,8 +27,13 @@
     transform: translateY(20px);
     transition: opacity 0.5s ease, transform 0.5s ease, width 0.6s ease, height 0.6s ease;
     pointer-events: none;
+    border-radius: 10px;
+    border: 1.5px solid rgba(145, 70, 255, 0.85);
+    box-shadow: 0 0 10px rgba(145, 70, 255, 0.65), 0 0 24px rgba(145, 70, 255, 0.25);
   }
   #overlay.compact {
+    border-color: transparent;
+    box-shadow: none;
     width: 160px;
     height: 160px;
   }
@@ -89,7 +94,7 @@
   /* ── Train ── */
   #train-wrapper {
     position: absolute;
-    bottom: 28px;
+    bottom: 18px;
     left: 60px;
   }
   #train-wrapper.train-enter {
@@ -112,7 +117,10 @@
     display: flex;
     align-items: flex-end;
     gap: 2px;
-    filter: drop-shadow(0 4px 12px rgba(100, 65, 165, 0.8));
+    filter:
+      drop-shadow(0 0 2px rgba(200, 150, 255, 0.95))
+      drop-shadow(0 0 6px rgba(145, 70, 255, 0.65))
+      drop-shadow(0 4px 10px rgba(100, 65, 165, 0.7));
   }
   #train.riding {
     animation: train-ride 0.18s ease-in-out infinite alternate;
@@ -141,12 +149,20 @@
     border-radius: 50%;
     opacity: 0;
   }
-  #train.riding .puff:nth-child(1) { animation: puff 0.9s ease-out 0.0s infinite; }
-  #train.riding .puff:nth-child(2) { animation: puff 0.9s ease-out 0.2s infinite; }
-  #train.riding .puff:nth-child(3) { animation: puff 0.9s ease-out 0.4s infinite; }
-  @keyframes puff {
-    0%   { opacity: 0.9; transform: translateY(0) scale(0.6); }
-    100% { opacity: 0;   transform: translateY(-28px) scale(2.2); }
+  #train.riding .puff:nth-child(1) { animation: puff1 1.0s ease-out 0.0s infinite; }
+  #train.riding .puff:nth-child(2) { animation: puff2 1.0s ease-out 0.15s infinite; }
+  #train.riding .puff:nth-child(3) { animation: puff3 1.0s ease-out 0.3s infinite; }
+  @keyframes puff1 {
+    0%   { opacity: 0.9;  transform: translateY(0px)   scale(0.6); }
+    100% { opacity: 0;    transform: translateY(-18px)  scale(1.4); }
+  }
+  @keyframes puff2 {
+    0%   { opacity: 0.75; transform: translateY(-10px) scale(0.9); }
+    100% { opacity: 0;    transform: translateY(-28px) scale(1.8); }
+  }
+  @keyframes puff3 {
+    0%   { opacity: 0.55; transform: translateY(-20px) scale(1.2); }
+    100% { opacity: 0;    transform: translateY(-38px) scale(2.2); }
   }
 
   /* Speed lines */
@@ -279,11 +295,10 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg,
-      rgba(10, 4, 20, 0) 0%,
-      rgba(15, 6, 30, 0.75) 40%,
-      rgba(20, 8, 40, 0.9) 100%
+      rgba(8, 2, 20, 0.82) 0%,
+      rgba(10, 3, 26, 0.92) 45%,
+      rgba(13, 4, 32, 0.97) 100%
     );
-    border-top: 1px solid rgba(100, 65, 165, 0.3);
   }
 
   /* ── Compact mode ── */
@@ -341,6 +356,10 @@
     top: 76px;
     left: 50%;
     transform: translateX(-50%);
+    filter:
+      drop-shadow(0 0 2px rgba(200, 150, 255, 0.95))
+      drop-shadow(0 0 6px rgba(145, 70, 255, 0.65))
+      drop-shadow(0 4px 10px rgba(100, 65, 165, 0.7));
   }
   .compact-engine-wrap .engine {
     width: 90px;
@@ -692,7 +711,11 @@ function startDemo() {
       overlay.classList.remove('compact');
       trainSlideOut();
       fireBurst();
-      hideOverlay(5000);
+      setTimeout(() => {
+        train.classList.remove('riding');
+        overlay.classList.add('compact');
+      }, 1500);
+      hideOverlay(7000);
       return;
     }
     setProgress(progress, goal);

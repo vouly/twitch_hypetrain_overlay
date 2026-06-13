@@ -13,7 +13,7 @@ Wenn auf deinem Kanal ein Hype Train startet, fährt ein animierter Zug ins Bild
 
 - **Animierter Zug** mit Lok, zwei Waggons, Dampfwolken und Schienenschweller-Scroll
 - **Shimmer-Fortschrittsbalken** mit Level-Badge und Milestone-Markierungen
-- **Kompakt-Modus** – kollabiert nach 30 s Pause auf einen kreisförmigen Ring-Fortschritt
+- **Kompakt-Modus** – kollabiert nach 10 s Pause auf einen kreisförmigen Ring-Fortschritt
 - **Automatischer Reconnect** – der WebSocket zu Twitch und zur Overlay-Seite verbindet sich nach Verbindungsabbrüchen selbst neu
 - **Token-Refresh** – abgelaufene OAuth-Tokens werden im Hintergrund erneuert, kein Neustart nötig
 - **Setup-Wizard** – erster Start öffnet ein Browser-Formular, kein manuelles Bearbeiten der `.env` nötig

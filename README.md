@@ -4,7 +4,8 @@ Ein animiertes Browser-Overlay für Twitch Hype Trains – als OBS Browser Sourc
 
 Wenn auf deinem Kanal ein Hype Train startet, fährt ein animierter Zug ins Bild, zeigt den aktuellen Level und den Fortschritt per Shimmer-Balken an und verschwindet 8 Sekunden nach dem Ende wieder. Nach 10 Sekunden Inaktivität schrumpft das Overlay auf einen kompakten Ring-Modus (160 × 160 px), der diskret in einer Ecke bleibt.
 
-![Demo-Modus](public/Train_Minimal.png) ![Demo-Modus](public/Train_Progress.gif)
+[Vorschauvideo](https://github.com/user-attachments/assets/37973107-dc83-4a18-ba2f-b972755933ea)
+
 > Tipp: Öffne die `public/overlay.html` direkt im Browser ohne laufenden Server – das Overlay startet automatisch eine Demo-Animation durch alle 5 Level.
 
 ---
@@ -13,7 +14,7 @@ Wenn auf deinem Kanal ein Hype Train startet, fährt ein animierter Zug ins Bild
 
 - **Animierter Zug** mit Lok, zwei Waggons, Dampfwolken und Schienenschweller-Scroll
 - **Shimmer-Fortschrittsbalken** mit Level-Badge und Milestone-Markierungen
-- **Kompakt-Modus** – kollabiert nach 30 s Pause auf einen kreisförmigen Ring-Fortschritt
+- **Kompakt-Modus** – kollabiert nach 10 s Pause auf einen kreisförmigen Ring-Fortschritt
 - **Automatischer Reconnect** – der WebSocket zu Twitch und zur Overlay-Seite verbindet sich nach Verbindungsabbrüchen selbst neu
 - **Token-Refresh** – abgelaufene OAuth-Tokens werden im Hintergrund erneuert, kein Neustart nötig
 - **Setup-Wizard** – erster Start öffnet ein Browser-Formular, kein manuelles Bearbeiten der `.env` nötig
@@ -116,6 +117,16 @@ Mit laufendem Server können Events manuell ausgelöst werden – kein echter Hy
 | `http://localhost:3000/health` | Serverstatus und Anzahl verbundener Clients |
 
 Alle Query-Parameter bei `begin` und `progress` sind optional; ohne Angabe werden Standardwerte verwendet.
+
+### Golden Kappa Train
+
+Der seltene Golden Kappa Train färbt Zug, Schienen, Fortschrittsbalken und alle Akzente in Gold. Zum Testen `train_type=golden_kappa` an die begin-URL anhängen:
+
+```
+http://localhost:3000/test/begin?train_type=golden_kappa
+```
+
+Mögliche Werte für `train_type`: `regular`, `treasure`, `golden_kappa`.
 
 ---
 
